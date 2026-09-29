@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm src/data/storage.ts)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -w ' [%{http_code}]\\\\n' https://zamokxppgnwwscbmhiol.supabase.co/auth/v1/settings -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphbW9reHBwZ253d3NjYm1oaW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0NDYyMDAsImV4cCI6MjEwNjAyMjIwMH0.NtluI1UQIuSy-O6rCAqhYuA2KcmzAVzVFVti587FJzM')",
+      "Bash(head -n 233 src/data/repository.ts)",
+      "Read(//tmp/**)"
+    ]
+  }
+}

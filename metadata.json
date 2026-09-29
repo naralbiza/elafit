@@ -1,0 +1,6 @@
+{
+  "name": "Ela Fit - Gestor de Negócio",
+  "description": "Sistema de gestão empresarial integrado com CRM de Alunas, Módulo Financeiro, Recursos Humanos e Inteligência de Negócio para o ginásio feminino Ela Fit.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
