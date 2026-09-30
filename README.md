@@ -37,6 +37,8 @@ npm run build
 npm start
 ```
 
+O frontend e o `server.ts` devem ser publicados no mesmo serviço/domínio. Se forem publicados separadamente, defina `VITE_API_URL` no build do frontend com a URL pública do servidor e `CORS_ORIGIN` no servidor com o domínio do frontend. Sem o servidor Express, as rotas `/api/admin/users` não existem e a criação de utilizadores devolve 404.
+
 ## Variáveis de ambiente
 
 | Variável                    | Obrigatória | Descrição                                                        |

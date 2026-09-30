@@ -43,7 +43,12 @@ const emptyForm: UserForm = {
 async function readJson(res: Response) {
   if (res.status === 204) return {};
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || `Erro ${res.status}`);
+  if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error('O serviço de gestão de utilizadores não está disponível neste endereço. Verifique a configuração VITE_API_URL da produção.');
+    }
+    throw new Error(data.error || `Erro ${res.status}`);
+  }
   return data;
 }
 

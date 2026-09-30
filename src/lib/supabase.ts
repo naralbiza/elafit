@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+// Optional public Express API address for split frontend/backend deployments.
+const apiBaseUrl = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || '';
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
@@ -23,5 +25,6 @@ export async function apiFetch(input: string, init: RequestInit = {}): Promise<R
   const headers = new Headers(init.headers);
   if (data.session) headers.set('Authorization', `Bearer ${data.session.access_token}`);
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
-  return fetch(input, { ...init, headers });
+  const url = apiBaseUrl && input.startsWith('/') ? `${apiBaseUrl}${input}` : input;
+  return fetch(url, { ...init, headers });
 }

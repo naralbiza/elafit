@@ -17,6 +17,12 @@ const IS_PRODUCTION =
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const CORS_ALLOWED_ORIGINS = new Set(
+  (process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/$/, ''))
+    .filter(Boolean)
+);
 
 // Cliente com service role: ignora RLS. Usar só no servidor, nunca expor ao browser.
 const supabaseAdmin =
@@ -27,6 +33,19 @@ const supabaseAdmin =
     : null;
 
 app.use(express.json());
+
+// Only required if the frontend and Express API are deployed on different origins.
+app.use((req, res, next) => {
+  const origin = req.headers.origin?.replace(/\/$/, '');
+  if (!origin || !CORS_ALLOWED_ORIGINS.has(origin)) return next();
+
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 
 // ---------- Autenticação ----------
 
