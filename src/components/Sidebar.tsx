@@ -7,12 +7,11 @@ import {
   Calendar,
   Activity,
   ShoppingBag,
-  Sparkles,
   BarChart3,
-  Settings,
   Target,
   ShieldCheck,
   CalendarDays,
+  Compass,
 } from 'lucide-react';
 import { TabType } from '../types';
 import { useAuth } from '../auth/AuthContext';
@@ -35,7 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'plans' as TabType, label: 'Planos e Vendas', icon: ShoppingBag },
     { id: 'marketing' as TabType, label: 'Marketing', icon: Target },
     { id: 'reports' as TabType, label: 'Relatórios', icon: BarChart3 },
-    { id: 'ai' as TabType, label: 'Configurações', icon: Settings },
+    { id: 'ai' as TabType, label: 'Inteligência Estratégica', icon: Compass },
   ];
   const menuItems = allItems.filter((item) => item.id !== 'users' && hasModule(item.id as Exclude<TabType, 'users'>));
   if (profile?.is_admin) {
@@ -43,16 +42,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
   }
 
   return (
-    <aside className="w-64 bg-[#303227] text-[#E5E0DA] min-h-screen flex flex-col justify-between p-4 sticky top-0 h-screen overflow-y-auto shrink-0 select-none border-r border-[#3D3F33] z-20">
+    <aside className="w-64 bg-[#20221A] text-[#E5E0DA] min-h-screen flex flex-col justify-between p-4 sticky top-0 h-screen overflow-y-auto shrink-0 border-r border-[#323529] z-20 shadow-sm">
       <div>
         {/* Brand Logo & Tagline Header */}
         <div 
-          className="pt-2 pb-5 px-3 flex flex-col items-center justify-center cursor-pointer transition-transform hover:scale-[1.02]"
+          className="pt-4 pb-6 px-3 flex flex-col items-center justify-center cursor-pointer select-none"
           onClick={() => menuItems[0] && setActiveTab(menuItems[0].id)}
         >
           {/* Official Brand Seal Logo */}
           <div className="relative group flex items-center justify-center">
-            <div className="w-24 h-24 rounded-full bg-[#FAF7F2] p-2 flex items-center justify-center shadow-lg border-2 border-[#D8B69F]/40 transition-all duration-300 group-hover:scale-105 group-hover:border-[#D8B69F] group-hover:shadow-[#D8B69F]/20">
+            <div className="w-20 h-20 rounded-full bg-[#FAF7F2] p-2 flex items-center justify-center border border-[#D8B69F]/50 shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:border-[#D8B69F]">
               <img 
                 src="/logo.png" 
                 alt="Ela Fit - Ao Seu Ritmo" 
@@ -62,19 +61,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
           </div>
           
           {/* Title & Tagline */}
-          <div className="text-center mt-2.5">
+          <div className="text-center mt-3">
             <h1 className="font-serif text-base font-bold text-[#FAF7F2] tracking-wide leading-tight">
               Ela Fit
             </h1>
-            <div className="flex items-center justify-center gap-1.5 mt-1 px-2.5 py-0.5 rounded-full bg-[#3D3F34] text-[9px] text-[#D8B69F] font-medium tracking-wider uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D8B69F] animate-pulse"></span>
+            <div className="inline-flex items-center justify-center gap-1.5 mt-1.5 px-2.5 py-0.5 rounded-full bg-[#2E3126] border border-[#3E4233] text-[9px] text-[#D8B69F] font-semibold tracking-wider uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D8B69F]"></span>
               <span>Ao Seu Ritmo</span>
             </div>
           </div>
         </div>
 
         {/* Navigation Menu List */}
-        <nav className="space-y-1 mt-1">
+        <nav className="space-y-1 mt-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -83,14 +82,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
               <button
                 key={item.label}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs font-medium transition-all ${
                   isActive
-                    ? 'bg-[#414336] text-[#FFFFFF] font-semibold shadow-xs'
-                    : 'text-[#B0ABA3] hover:text-[#FFFFFF] hover:bg-[#393B2F]'
+                    ? 'bg-[#33372B] text-[#FFFFFF] font-semibold border-l-[3px] border-[#D8B69F] rounded-r-xl shadow-xs'
+                    : 'text-[#A6A197] hover:text-[#FFFFFF] hover:bg-[#2A2E23] rounded-xl'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#E8D5C8]' : 'text-[#8F8880]'}`} />
-                <span className="tracking-wide">{item.label}</span>
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#E8D5C8]' : 'text-[#827D74]'}`} />
+                <span className="tracking-wide text-left truncate">{item.label}</span>
               </button>
             );
           })}
@@ -98,13 +97,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
       </div>
 
       {/* Bottom Promo Card in Sidebar with Exact Reference Image */}
-      <div className="mt-4 pt-3">
-        <div className="relative rounded-2xl overflow-hidden shadow-md border border-[#434638] group cursor-pointer">
+      <div className="mt-4 pt-3 border-t border-[#2E3225]">
+        <div className="relative rounded-xl overflow-hidden border border-[#3A3E30] group cursor-pointer shadow-xs">
           <img
-            src="/sidebar-bottom-card.jpg"
-            alt="Mulheres mais fortes, vidas mais felizes"
-            className="w-full h-44 object-cover object-center filter brightness-[0.9] group-hover:scale-105 transition-transform duration-300"
+            src="/community-training.webp"
+            alt="Treino em grupo no ginásio Ela Fit"
+            className="w-full h-40 object-cover object-center filter brightness-[0.88] group-hover:scale-105 transition-transform duration-300"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#20221A]/90 via-[#20221A]/20 to-transparent flex items-end p-2.5">
+            <p className="text-[10px] font-semibold text-[#E8D5C8] leading-tight drop-shadow-xs">
+              Comunidade & Treino
+            </p>
+          </div>
         </div>
       </div>
     </aside>

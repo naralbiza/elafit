@@ -55,31 +55,32 @@ export const LoginPage: React.FC<{ recovery?: boolean }> = ({ recovery = false }
   };
 
   const inputClass =
-    'w-full pl-10 pr-4 py-2.5 bg-[#EFECE8] border border-[#E4DED8] rounded-xl text-sm text-[#2C3228] placeholder:text-[#9A9187] focus:outline-none focus:ring-1 focus:ring-[#303227] focus:bg-white transition-all';
+    'w-full pl-10 pr-4 py-3 bg-[#FAF9F6] border border-[#DCD6CE] rounded-lg text-sm text-[#2C3228] placeholder:text-[#9A9187] focus:outline-none focus:ring-1 focus:ring-[#8C6353] focus:bg-white transition-all';
 
   return (
-    <div className="min-h-screen bg-[#F4F2EE] text-[#2C3228] font-sans flex antialiased">
+    <div className="min-h-screen bg-[#F2F0EB] text-[#2C3228] font-sans flex antialiased">
       {/* Painel da marca */}
-      <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-[#303227]">
-        <img src="/hero-banner.jpg" alt="" className="absolute inset-0 w-full h-full object-cover opacity-50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#303227] via-[#303227]/40 to-transparent" />
-        <div className="relative z-10 mt-auto p-12 text-[#FAF7F2]">
-          <h2 className="font-serif text-4xl font-bold leading-tight">Mulheres mais fortes,<br />vidas mais felizes.</h2>
-          <p className="mt-3 text-sm text-[#E5E0DA] max-w-md">
+      <div className="hidden lg:flex w-[54%] relative overflow-hidden bg-[#303227]">
+        <img src="/login-hero.webp" alt="Treino no ginásio Ela Fit" className="absolute inset-0 w-full h-full object-cover object-center opacity-70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#303227]/95 via-[#303227]/45 to-[#303227]/10" />
+        <div className="relative z-10 mt-auto p-14 text-[#FAF7F2] max-w-xl">
+          <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#E7C7B0] mb-4">Ela Fit · Ao seu ritmo</p>
+          <h2 className="font-serif text-5xl font-bold leading-[1.04]">Força para viver<br />do seu jeito.</h2>
+          <p className="mt-5 text-sm text-[#E5E0DA] max-w-md leading-relaxed">
             CRM de alunas, financeiro, recursos humanos, aulas e inteligência de negócio num só lugar.
           </p>
         </div>
       </div>
 
       {/* Formulário */}
-      <div className="flex-1 flex items-center justify-center p-6">
+      <div className="flex-1 flex items-center justify-center p-8 sm:p-12">
         <div className="w-full max-w-sm">
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-20 h-20 rounded-full bg-[#FAF7F2] p-2 flex items-center justify-center shadow-md border-2 border-[#D8B69F]/50">
+          <div className="flex flex-col items-start mb-10">
+            <div className="w-16 h-16 rounded-full bg-[#FAF7F2] p-2 flex items-center justify-center border border-[#D8B69F]/50">
               <img src="/logo.png" alt="Ela Fit - Ao Seu Ritmo" className="w-full h-full object-contain" />
             </div>
-            <h1 className="font-serif text-2xl font-bold text-[#303227] mt-4">{titles[mode].title}</h1>
-            <p className="text-xs text-[#7A7067] mt-1 text-center">{titles[mode].subtitle}</p>
+            <h1 className="font-serif text-3xl font-bold text-[#303227] mt-5">{titles[mode].title}</h1>
+            <p className="text-xs text-[#7A7067] mt-2 leading-relaxed">{titles[mode].subtitle}</p>
           </div>
 
           {!isSupabaseConfigured && (
@@ -182,7 +183,7 @@ export const LoginPage: React.FC<{ recovery?: boolean }> = ({ recovery = false }
             <button
               type="submit"
               disabled={submitting || !isSupabaseConfigured}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#303227] hover:bg-[#414336] disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-all shadow-sm"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-[#303227] hover:bg-[#414336] disabled:opacity-60 text-white rounded-lg text-sm font-semibold transition-all"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
               {mode === 'login' ? 'Entrar' : mode === 'forgot' ? 'Enviar link' : 'Guardar nova senha'}

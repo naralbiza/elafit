@@ -12,6 +12,7 @@ import {
   Circle,
   UserPlus,
   Plus,
+  Compass,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -258,8 +259,8 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
       </div>
 
       {/* 2. KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ECE8E3] shadow-xs flex items-center justify-between">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="surface-panel p-4.5 flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-full bg-[#F7ECE6] flex items-center justify-center shrink-0">
               <Users className="w-5 h-5 text-[#8C6353]" />
@@ -275,7 +276,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
           </div>
         </div>
 
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ECE8E3] shadow-xs flex items-center justify-between">
+        <div className="surface-panel p-4.5 flex items-center justify-between">
           <div className="flex items-center gap-3.5 min-w-0">
             <div className="w-12 h-12 rounded-full bg-[#E6F0EB] flex items-center justify-center shrink-0">
               <TrendingUp className="w-5 h-5 text-[#3A6B4C]" />
@@ -291,7 +292,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
           </div>
         </div>
 
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ECE8E3] shadow-xs flex items-center justify-between">
+        <div className="surface-panel p-4.5 flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-full bg-[#F5ECE5] flex items-center justify-center shrink-0">
               <Dumbbell className="w-5 h-5 text-[#8C6353]" />
@@ -307,7 +308,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
           </div>
         </div>
 
-        <div className="bg-white p-4.5 rounded-2xl border border-[#ECE8E3] shadow-xs flex items-center justify-between">
+        <div className="surface-panel p-4.5 flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-full bg-[#FDECEB] flex items-center justify-center shrink-0">
               <Heart className="w-5 h-5 text-[#C85252]" />
@@ -336,12 +337,17 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
 
       {/* 3. Hero Banner + Quick Actions + Today's Schedule */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-        <div className="lg:col-span-8 bg-white rounded-2xl border border-[#ECE8E3] p-2 shadow-xs grid grid-cols-1 md:grid-cols-12 overflow-hidden">
-          <div className="md:col-span-7 relative rounded-xl overflow-hidden min-h-[220px] flex flex-col justify-end p-6">
+        <div className="lg:col-span-8 surface-panel p-2 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+          <div className="md:col-span-7 relative rounded-lg overflow-hidden min-h-[250px] flex flex-col justify-end p-7">
             <img
-              src="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=800&q=80"
+              src="/dashboard-community.webp"
               alt="Corpo saudável, mente mais forte"
-              className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.82]"
+              className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.62]"
+            />
+            <img
+              src="/brand-sign.webp"
+              alt="Ela Fit — Ao Seu Ritmo"
+              className="absolute top-3 right-3 w-16 h-16 rounded-full object-cover border border-white/50 shadow-lg"
             />
             <div className="relative z-10 space-y-3">
               <h2 className="font-serif text-2xl font-bold text-white max-w-xs leading-snug drop-shadow-md">
@@ -362,7 +368,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
               { tab: 'crm' as TabType, icon: Users, title: 'Acompanhar Clientes', desc: 'Evolução e resultados' },
               { tab: 'hr' as TabType, icon: UserCheck, title: 'Gerir Equipa', desc: 'Instrutoras e colaboradores' },
               { tab: 'finance' as TabType, icon: CreditCard, title: 'Controlar Finanças', desc: 'Receitas, despesas e lucros' },
-              { tab: 'ai' as TabType, icon: Target, title: 'Fazer o Negócio Crescer', desc: 'Mais mulheres a transformar vidas' },
+              { tab: 'ai' as TabType, icon: Compass, title: 'Inteligência Estratégica', desc: 'Conselho e auditoria de gestão' },
             ].map(({ tab, icon: Icon, title, desc }) => (
               <div
                 key={tab}
@@ -381,7 +387,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
           </div>
         </div>
 
-        <div className="lg:col-span-4 bg-white rounded-2xl border border-[#ECE8E3] p-5 shadow-xs flex flex-col">
+        <div className="lg:col-span-4 surface-panel p-5 flex flex-col">
           <div className="flex items-center justify-between pb-3 border-b border-[#F2ECE6]">
             <h3 className="font-serif text-base font-bold text-[#2C3228]">Aulas de Hoje</h3>
             <button onClick={() => setActiveTab('agenda')} className="text-[11px] font-semibold text-[#8C6353] hover:underline flex items-center gap-0.5">

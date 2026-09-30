@@ -79,7 +79,7 @@ export function App() {
 
 function Workspace() {
   const { profile, hasModule } = useAuth();
-  const { error: dataError, reloadAll } = useData();
+  const { error: dataError, reloadAll, members, transactions, employees, insights, actions } = useData();
 
   const allowedTabs: TabType[] = [
     ...MODULE_IDS.filter((m) => hasModule(m)),
@@ -142,7 +142,8 @@ function Workspace() {
           {(activeTab === 'crm' || activeTab === 'marketing') && (
             <CRMModule
               key={activeTab}
-              initialSubTab={activeTab === 'marketing' ? 'communication' : 'kanban'}
+              members={members}
+              onUpdateMember={actions.saveMember}
               onOpenAddMember={() => setIsAddMemberOpen(true)}
               onSelectMember={(m) => setSelectedMemberId(m.id)}
             />
@@ -168,22 +169,24 @@ function Workspace() {
 
           {activeTab === 'reports' && <ReportsModule />}
 
-          {activeTab === 'ai' && <EcosystemAI />}
+          {activeTab === 'ai' && <EcosystemAI members={members} transactions={transactions} employees={employees} insights={insights} />}
 
           {activeTab === 'users' && profile?.is_admin && <UserManagement onDataImported={reloadAll} />}
         </main>
       </div>
 
       {/* MODALS */}
-      <AddMemberModal isOpen={isAddMemberOpen} onClose={() => setIsAddMemberOpen(false)} />
+      <AddMemberModal isOpen={isAddMemberOpen} onClose={() => setIsAddMemberOpen(false)} onAddMember={actions.saveMember} />
 
       <AddTransactionModal
         isOpen={transactionDraft !== null}
         initial={transactionDraft}
+        members={members}
+        onAddTransaction={actions.saveTransaction}
         onClose={() => setTransactionDraft(null)}
       />
 
-      <MemberDetailsModal memberId={selectedMemberId} onClose={() => setSelectedMemberId(null)} />
+      <MemberDetailsModal member={members.find((m) => m.id === selectedMemberId) ?? null} onClose={() => setSelectedMemberId(null)} onUpdateMember={actions.saveMember} />
 
       <ReceiptModal transaction={selectedReceiptTx} onClose={() => setSelectedReceiptTx(null)} />
     </div>

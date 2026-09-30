@@ -3,18 +3,18 @@ import React from 'react';
 import { PaymentStatus } from '../../types';
 
 export const inputCls =
-  'w-full px-3 py-2 bg-[#FBF9F6] border border-[#E2DAD1] rounded-xl text-xs text-[#2C3228] focus:outline-none focus:ring-1 focus:ring-[#2C3228]';
+  'w-full px-3 py-2 bg-[#FCFBF8] border border-[#DED9D1] rounded-lg text-xs text-[#2C3228] focus:outline-none focus:ring-1 focus:ring-[#8C6353]';
 
 export const smallInputCls =
-  'px-3 py-1.5 bg-white border border-[#E2DAD1] rounded-xl text-xs text-[#2C3228] focus:outline-none focus:ring-1 focus:ring-[#2C3228]';
+  'px-3 py-1.5 bg-white border border-[#DED9D1] rounded-lg text-xs text-[#2C3228] focus:outline-none focus:ring-1 focus:ring-[#8C6353]';
 
 export const primaryBtn =
-  'px-4 py-2 bg-[#2C3228] text-white hover:bg-[#3E4639] rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 disabled:opacity-60';
+  'px-4 py-2 bg-[#303227] text-white hover:bg-[#44463a] rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-60';
 
 export const secondaryBtn =
-  'px-3 py-2 bg-[#F4ECE6] hover:bg-[#EBE0D7] text-[#2C3228] border border-[#E0D3C7] rounded-xl text-xs font-semibold flex items-center gap-1.5 disabled:opacity-60';
+  'px-3 py-2 bg-transparent hover:bg-[#F3EEE8] text-[#2C3228] border border-[#D8D0C7] rounded-lg text-xs font-semibold flex items-center gap-1.5 disabled:opacity-60';
 
-export const iconBtn = 'p-1.5 rounded-lg hover:bg-[#EFECE8] text-[#5E574F]';
+export const iconBtn = 'p-1.5 rounded-md hover:bg-[#EFECE8] text-[#5E574F]';
 
 // Paleta categórica validada (ordem fixa, cor segue a categoria)
 export const SERIES_COLORS = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7'];
@@ -29,7 +29,7 @@ export const Card: React.FC<{ title?: React.ReactNode; subtitle?: React.ReactNod
   className = '',
   children,
 }) => (
-  <div className={`bg-white p-5 rounded-2xl border border-[#ECE5DE] shadow-xs ${className}`}>
+  <section className={`surface-panel p-5 ${className}`}>
     {(title || actions) && (
       <div className="flex flex-wrap items-start justify-between gap-2 mb-4">
         <div>
@@ -40,7 +40,7 @@ export const Card: React.FC<{ title?: React.ReactNode; subtitle?: React.ReactNod
       </div>
     )}
     {children}
-  </div>
+  </section>
 );
 
 export const Kpi: React.FC<{
@@ -58,14 +58,18 @@ export const Kpi: React.FC<{
     neutral: 'bg-[#F4ECE6] text-[#2C3228]',
   }[tone];
   return (
-    <div className="bg-white p-5 rounded-2xl border border-[#ECE5DE] shadow-xs">
-      <div className="flex items-center justify-between">
-        <span className={`p-2.5 rounded-xl ${tones}`}>{icon}</span>
-        {badge && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${tones}`}>{badge}</span>}
+    <div className="surface-panel p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-bold text-[#8C827A] uppercase tracking-[0.14em]">{label}</p>
+          <p className="font-serif text-2xl font-bold text-[#2C3228] mt-2">{value}</p>
+        </div>
+        <span className={`mt-0.5 ${tones.replace('bg-', 'text-').split(' ')[1] ?? 'text-[#2C3228]'}`}>{icon}</span>
       </div>
-      <p className="text-xs font-semibold text-[#8C827A] mt-3 uppercase tracking-wider">{label}</p>
-      <p className="font-serif text-2xl font-bold text-[#2C3228] mt-1">{value}</p>
-      {hint && <p className="text-[11px] text-[#8C827A] mt-1">{hint}</p>}
+      <div className="mt-3 pt-2 border-t border-[#ECE5DE] flex justify-between gap-2 text-[11px]">
+        {hint && <span className="text-[#8C827A]">{hint}</span>}
+        {badge && <span className="font-semibold text-[#61574E] ml-auto">{badge}</span>}
+      </div>
     </div>
   );
 };

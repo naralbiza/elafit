@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, UserPlus, Sparkles } from 'lucide-react';
+import { X, UserPlus } from 'lucide-react';
 import { Member, PlanType, LeadStatus } from '../../types';
 
 interface AddMemberModalProps {

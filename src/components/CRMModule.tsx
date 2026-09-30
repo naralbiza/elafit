@@ -8,7 +8,6 @@ import {
   Mail,
   Send,
   Calendar,
-  Sparkles,
   ChevronRight,
   Filter,
   CheckCircle2,
@@ -16,7 +15,11 @@ import {
   MessageSquare,
   Activity,
   FileText,
-  UserPlus
+  UserPlus,
+  MessageSquareQuote,
+  SendHorizontal,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { Member, LeadStatus, MemberStatus, PlanType } from '../types';
 import { formatKz } from '../utils/formatters';
@@ -48,11 +51,12 @@ export const CRMModule: React.FC<CRMModuleProps> = ({
   const [filterPlan, setFilterPlan] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
-  // AI Message Generator State
+  // Communication Studio State
   const [draftRecipient, setDraftRecipient] = useState('');
   const [draftType, setDraftType] = useState('Boas-vindas Ela Fit');
   const [generatedMsg, setGeneratedMsg] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleStageChange = (member: Member, newStage: LeadStatus) => {
     const updated: Member = {
@@ -90,11 +94,11 @@ export const CRMModule: React.FC<CRMModuleProps> = ({
       if (data.message) {
         setGeneratedMsg(data.message);
       } else {
-        if (data.error) console.error('ElaFit AI:', data.error);
-        setGeneratedMsg(`Olá ${draftRecipient}! ✨ Na Ela Fit adoramos acompanhar a sua jornada no seu próprio ritmo. Temos novidades incríveis no estúdio este mês! Quando podemos agendar o seu treino?`);
+        if (data.error) console.error('ElaFit:', data.error);
+        setGeneratedMsg(`Olá ${draftRecipient}! Na Ela Fit acompanhamos a sua evolução com todo o carinho e ao seu próprio ritmo. Temos novidades especiais no estúdio preparadas para si este mês. Quando podemos agendar a sua próxima sessão?`);
       }
     } catch {
-      setGeneratedMsg(`Olá ${draftRecipient}! ✨ Na Ela Fit cuidamos da sua saúde e bem-estar ao seu ritmo. Venha experimentar o nosso Studio de Pilates Reformer!`);
+      setGeneratedMsg(`Olá ${draftRecipient}! Na Ela Fit cuidamos da sua saúde e bem-estar ao seu ritmo. Venha experimentar o nosso Studio de Pilates Reformer!`);
     } finally {
       setIsGenerating(false);
     }
@@ -133,7 +137,7 @@ export const CRMModule: React.FC<CRMModuleProps> = ({
           { id: 'kanban', label: 'Funil de Vendas (Kanban)' },
           { id: 'list', label: 'Lista Geral de Alunas' },
           { id: 'trials', label: 'Aulas Experimentais' },
-          { id: 'communication', label: 'Comunicação & Mensagens IA' },
+          { id: 'communication', label: 'Estúdio de Comunicação' },
         ].map((sub) => (
           <button
             key={sub.id}
@@ -403,99 +407,161 @@ export const CRMModule: React.FC<CRMModuleProps> = ({
         </div>
       )}
 
-      {/* SUBTAB 4: AI COMMUNICATIONS */}
-      {activeSubTab === 'communication' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-[#FFFFFF] p-6 rounded-2xl border border-[#ECE5DE] shadow-xs space-y-4">
-            <h3 className="font-serif text-lg font-bold text-[#2C3228] flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#D0A68D]" />
-              Gerador Inteligente de Comunicação
-            </h3>
-            <p className="text-xs text-[#7A7067]">
-              Gere mensagens profissionais no tom elegante do Ela Fit para envio por WhatsApp ou SMS.
-            </p>
+      {/* SUBTAB 4: COMMUNICATION STUDIO */}
+      {activeSubTab === 'communication' && (() => {
+        const matchedMember = safeMembers.find(
+          (m) => m.name.toLowerCase() === draftRecipient.trim().toLowerCase()
+        );
+        const waPhone = matchedMember?.phone ? matchedMember.phone.replace(/[^0-9]/g, '') : '';
+        const waUrl = waPhone
+          ? `https://wa.me/${waPhone}?text=${encodeURIComponent(generatedMsg)}`
+          : `https://wa.me/?text=${encodeURIComponent(generatedMsg)}`;
 
-            <div className="space-y-3 pt-2">
-              <div>
-                <label className="text-xs font-bold text-[#2C3228] block mb-1">
-                  Nome da Aluna / Lead:
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: Sofia Henriques"
-                  value={draftRecipient}
-                  onChange={(e) => setDraftRecipient(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#FBF9F6] border border-[#E2DAD1] rounded-xl text-xs text-[#2C3228]"
-                />
-              </div>
+        const copyToClipboard = () => {
+          if (!generatedMsg) return;
+          navigator.clipboard.writeText(generatedMsg);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        };
 
-              <div>
-                <label className="text-xs font-bold text-[#2C3228] block mb-1">
-                  Objetivo da Comunicação:
-                </label>
-                <select
-                  value={draftType}
-                  onChange={(e) => setDraftType(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#FBF9F6] border border-[#E2DAD1] rounded-xl text-xs text-[#2C3228]"
-                >
-                  <option value="Boas-vindas Ela Fit">Boas-vindas à Aluna Matriculada</option>
-                  <option value="Lembrete de Renovação">Lembrete de Renovação de Mensalidade</option>
-                  <option value="Recuperação de Aluna Ausente">Recuperação de Aluna Ausente (Mais de 10 dias sem treinar)</option>
-                  <option value="Agradecimento de Aula Experimental">Agradecimento pós-Aula Experimental</option>
-                </select>
-              </div>
-
-              <button
-                onClick={handleGenerateAIMessage}
-                disabled={isGenerating || !draftRecipient}
-                className="w-full py-2.5 bg-[#2C3228] text-white font-bold text-xs rounded-xl hover:bg-[#3E4639] transition-all flex items-center justify-center gap-2"
-              >
-                {isGenerating ? (
-                  <span>A redigir mensagem com IA...</span>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 text-[#D0A68D]" />
-                    <span>Redigir Mensagem Personalizada</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Generated Result Box */}
-          <div className="bg-[#FBF9F6] p-6 rounded-2xl border border-[#ECE5DE] flex flex-col justify-between">
-            <div>
-              <h4 className="text-xs font-bold text-[#8C827A] uppercase tracking-wider">
-                Resultado da Mensagem
-              </h4>
-
-              {generatedMsg ? (
-                <div className="mt-3 p-4 bg-white border border-[#E0D3C7] rounded-2xl text-xs text-[#2C3228] leading-relaxed shadow-xs">
-                  {generatedMsg}
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-[#E2DDD5] shadow-xs space-y-4">
+              <div className="flex items-center gap-2.5 pb-3 border-b border-[#F0EBE3]">
+                <div className="w-8 h-8 rounded-xl bg-[#F5ECE5] text-[#8C6353] flex items-center justify-center shrink-0">
+                  <MessageSquareQuote className="w-4.5 h-4.5" />
                 </div>
-              ) : (
-                <div className="mt-6 text-center py-12 text-xs text-[#A0958C]">
-                  Selecione uma aluna e clique em "Redigir Mensagem" para gerar o texto.
+                <div>
+                  <h3 className="font-serif text-base font-bold text-[#222620]">
+                    Estúdio de Comunicação
+                  </h3>
+                  <p className="text-[11px] text-[#746E66]">
+                    Comunicação acolhedora e elegante no tom oficial Ela Fit.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3.5 pt-1">
+                <div>
+                  <label className="text-xs font-bold text-[#222620] block mb-1">
+                    Nome da Aluna / Lead:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      list="members-datalist"
+                      placeholder="Ex: Sofia Henriques"
+                      value={draftRecipient}
+                      onChange={(e) => setDraftRecipient(e.target.value)}
+                      className="w-full px-3 py-2.5 bg-white border border-[#DDD7CD] rounded-xl text-xs text-[#222620] focus:outline-none focus:ring-1 focus:ring-[#8C6353] focus:border-[#8C6353] shadow-2xs"
+                    />
+                    <datalist id="members-datalist">
+                      {safeMembers.slice(0, 15).map((m) => (
+                        <option key={m.id} value={m.name}>
+                          {m.name} ({m.plan})
+                        </option>
+                      ))}
+                    </datalist>
+                  </div>
+                  {matchedMember && (
+                    <p className="text-[10px] text-[#2E5C3E] font-medium mt-1 flex items-center gap-1">
+                      <Phone className="w-3 h-3" /> Contacto associado: {matchedMember.phone}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-[#222620] block mb-1">
+                    Objetivo da Comunicação:
+                  </label>
+                  <select
+                    value={draftType}
+                    onChange={(e) => setDraftType(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-white border border-[#DDD7CD] rounded-xl text-xs text-[#222620] focus:outline-none focus:ring-1 focus:ring-[#8C6353] shadow-2xs"
+                  >
+                    <option value="Boas-vindas Ela Fit">Boas-vindas à Aluna Matriculada</option>
+                    <option value="Lembrete de Renovação">Lembrete de Renovação de Mensalidade</option>
+                    <option value="Recuperação de Aluna Ausente">Recuperação de Aluna Ausente (Mais de 7 dias sem treinar)</option>
+                    <option value="Agradecimento de Aula Experimental">Agradecimento pós-Aula Experimental</option>
+                  </select>
+                </div>
+
+                <button
+                  onClick={handleGenerateAIMessage}
+                  disabled={isGenerating || !draftRecipient.trim()}
+                  className="w-full py-2.5 bg-[#2A2C24] text-white font-semibold text-xs rounded-xl hover:bg-[#3B3E32] transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <span>A estruturar mensagem executiva...</span>
+                  ) : (
+                    <>
+                      <SendHorizontal className="w-4 h-4 text-[#D8B69F]" />
+                      <span>Redigir Comunicação Personalizada</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Generated Result Box */}
+            <div className="lg:col-span-7 bg-white p-6 rounded-2xl border border-[#E2DDD5] shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE3]">
+                  <h4 className="text-xs font-bold text-[#746E66] uppercase tracking-wider">
+                    Mensagem Pronta para Envio
+                  </h4>
+                  {generatedMsg && (
+                    <span className="text-[10px] font-semibold text-[#8C847A] bg-[#F5F2EC] px-2 py-0.5 rounded-md">
+                      {generatedMsg.length} caracteres
+                    </span>
+                  )}
+                </div>
+
+                {generatedMsg ? (
+                  <div className="mt-4 p-4.5 bg-[#FAF8F5] border border-[#DDD7CD] rounded-2xl text-xs text-[#222620] leading-relaxed shadow-2xs">
+                    <p className="whitespace-pre-wrap">{generatedMsg}</p>
+                  </div>
+                ) : (
+                  <div className="mt-6 text-center py-16 text-xs text-[#9A9187] border-2 border-dashed border-[#EDE7DF] rounded-2xl">
+                    Indique o nome da aluna e clique em "Redigir Comunicação" para preparar o texto.
+                  </div>
+                )}
+              </div>
+
+              {generatedMsg && (
+                <div className="mt-5 pt-3 border-t border-[#F0EBE3] flex items-center justify-end gap-2.5 flex-wrap">
+                  <button
+                    onClick={copyToClipboard}
+                    className="px-3.5 py-2 bg-white hover:bg-[#FAF8F5] border border-[#DDD7CD] text-[#222620] font-semibold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-[#2E5C3E]" />
+                        <span className="text-[#2E5C3E]">Copiado!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-[#8C847A]" />
+                        <span>Copiar Texto</span>
+                      </>
+                    )}
+                  </button>
+
+                  <a
+                    href={waUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-2 bg-[#2E5C3E] text-white font-semibold text-xs rounded-xl hover:bg-[#254A32] flex items-center gap-1.5 shadow-xs transition-colors"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>{waPhone ? 'Enviar no WhatsApp da Aluna' : 'Abrir WhatsApp'}</span>
+                  </a>
                 </div>
               )}
             </div>
-
-            {generatedMsg && (
-              <div className="mt-4 flex items-center justify-end gap-2">
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(generatedMsg)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-4 py-2 bg-[#166534] text-white font-bold text-xs rounded-xl hover:bg-[#14532D] flex items-center gap-1.5 shadow-xs"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>Enviar por WhatsApp</span>
-                </a>
-              </div>
-            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

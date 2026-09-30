@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Wand2, CopyPlus, FileDown, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, CalendarSync, CopyPlus, FileDown, Loader2 } from 'lucide-react';
 import { ScheduledClass } from '../types';
 import { useData } from '../data/DataContext';
 import { useAuth } from '../auth/AuthContext';
@@ -232,7 +232,7 @@ export const AgendaModule: React.FC = () => {
           {canEdit && (
             <>
               <button onClick={generateFromTemplate} disabled={!!busy} className={secondaryBtn}>
-                {spin('gerar') || <Wand2 className="w-4 h-4 text-[#D0A68D]" />} Gerar semana a partir do Horário Fixo
+                {spin('gerar') || <CalendarSync className="w-4 h-4 text-[#D0A68D]" />} Gerar semana a partir do Horário Fixo
               </button>
               <button onClick={copyPreviousWeek} disabled={!!busy} className={secondaryBtn}>
                 {spin('copiar') || <CopyPlus className="w-4 h-4 text-[#D0A68D]" />} Copiar semana anterior

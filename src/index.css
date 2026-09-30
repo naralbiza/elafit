@@ -1,1 +1,132 @@
 @import "tailwindcss";
+
+:root {
+  --ink: #222620;
+  --forest: #2A2C24;
+  --forest-dark: #1E2018;
+  --paper: #FFFFFF;
+  --canvas: #F4F2EC;
+  --line: #E2DDD5;
+  --line-strong: #D5CEBF;
+  --muted: #746E66;
+  --clay: #8C6353;
+  --clay-hover: #755142;
+  --terracotta: #A96550;
+  --gold: #D8B69F;
+  --gold-subtle: #F5ECE5;
+  --emerald: #2E5C3E;
+  --emerald-subtle: #E8F2EC;
+}
+
+html {
+  background: var(--canvas);
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, .font-serif {
+  font-family: "Playfair Display", Georgia, serif;
+  letter-spacing: -0.025em;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+::selection {
+  background: #E8D5C8;
+  color: var(--ink);
+}
+
+/* Solid high-definition panels */
+.surface-panel {
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(40, 44, 36, 0.04), 0 1px 2px -1px rgba(40, 44, 36, 0.04);
+}
+
+.surface-card {
+  background: #FAF8F5;
+  border: 1px solid #E8E3DC;
+  border-radius: 14px;
+}
+
+.surface-subtle {
+  background: #F4F1EA;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.section-rule {
+  border-top: 1px solid var(--line);
+}
+
+/* Custom polished scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #D8D2C5;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #BDB5A5;
+}
+
+/* Clean utility buttons */
+.btn-primary-solid {
+  background: var(--forest);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary-solid:hover {
+  background: #3B3E32;
+}
+
+.btn-secondary-solid {
+  background: var(--gold-subtle);
+  color: var(--forest);
+  font-weight: 600;
+  border-radius: 12px;
+  border: 1px solid #E8D5C8;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-secondary-solid:hover {
+  background: #EAD8CC;
+}
+
+.btn-outline-solid {
+  background: #FFFFFF;
+  color: var(--ink);
+  font-weight: 600;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-outline-solid:hover {
+  background: #F8F6F2;
+  border-color: var(--line-strong);
+}
