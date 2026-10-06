@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Landmark, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Landmark, Plus, FileDown, Loader2, CheckCircle2, X } from 'lucide-react';
 import { Transaction } from '../types';
 import { currentMonthKey, monthLabel, shiftMonth } from '../utils/finance';
+import { downloadMonthlyReportPdf } from '../utils/monthlyReportPdf';
+import { useData } from '../data/DataContext';
 import { SummaryTab } from './finance/SummaryTab';
 import { TransactionsTab } from './finance/TransactionsTab';
 import { CollectionsTab } from './finance/CollectionsTab';
@@ -34,8 +36,29 @@ const tabs: { id: FinanceTab; label: string }[] = [
 ];
 
 export const FinancialModule: React.FC<FinancialModuleProps> = ({ onOpenAddTransaction, onEditTransaction, onOpenReceipt }) => {
+  const { transactions, payrollRuns, settings } = useData();
   const [activeTab, setActiveTab] = useState<FinanceTab>('summary');
   const [monthKey, setMonthKey] = useState(currentMonthKey);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [pdfSuccessMessage, setPdfSuccessMessage] = useState<string | null>(null);
+
+  const handleDownloadPdf = async () => {
+    try {
+      setIsGeneratingPdf(true);
+      await downloadMonthlyReportPdf({
+        monthKey,
+        transactions,
+        payrollRuns,
+        settings,
+      });
+      setPdfSuccessMessage(`Relatório financeiro de ${monthLabel(monthKey)} descarregado com sucesso!`);
+      setTimeout(() => setPdfSuccessMessage(null), 5000);
+    } catch (err) {
+      console.error('Erro ao gerar relatório mensal em PDF:', err);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -52,9 +75,36 @@ export const FinancialModule: React.FC<FinancialModuleProps> = ({ onOpenAddTrans
             <button className="p-2 hover:bg-[#F4ECE6] rounded-r-lg" onClick={() => setMonthKey((m) => shiftMonth(m, 1))} title="Mês seguinte"><ChevronRight className="w-4 h-4" /></button>
           </div>
           {monthKey !== currentMonthKey() && <button className={secondaryBtn} onClick={() => setMonthKey(currentMonthKey())}>Mês atual</button>}
+          
+          <button
+            className={secondaryBtn}
+            onClick={handleDownloadPdf}
+            disabled={isGeneratingPdf}
+            title="Gerar e descarregar relatório financeiro mensal completo em formato PDF"
+          >
+            {isGeneratingPdf ? (
+              <Loader2 className="w-4 h-4 animate-spin text-[#8C6353]" />
+            ) : (
+              <FileDown className="w-4 h-4 text-[#8C6353]" />
+            )}
+            <span>{isGeneratingPdf ? 'A gerar...' : 'Relatório PDF'}</span>
+          </button>
+
           <button className={primaryBtn} onClick={() => onOpenAddTransaction()}><Plus className="w-4 h-4 text-[#D0A68D]" /> Registar lançamento</button>
         </div>
       </div>
+
+      {pdfSuccessMessage && (
+        <div className="surface-panel p-3.5 bg-[#EAF5ED] border border-[#BBF7D0] text-[#166534] rounded-xl text-xs font-semibold flex items-center justify-between shadow-xs animate-in fade-in duration-200">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-[#166534] shrink-0" />
+            <span>{pdfSuccessMessage}</span>
+          </div>
+          <button onClick={() => setPdfSuccessMessage(null)} className="text-[#166534] hover:opacity-75 p-1 rounded-md">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       <div className="flex items-center gap-1 border-b border-[#DCD6CE] overflow-x-auto no-scrollbar">
         {tabs.map((tab) => (

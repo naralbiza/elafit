@@ -61,9 +61,9 @@ export const LoginPage: React.FC<{ recovery?: boolean }> = ({ recovery = false }
       {/* Painel do formulário */}
       <div className="relative min-h-screen lg:ml-auto lg:w-[46%] lg:min-w-[440px] flex items-center justify-center bg-[#FBF8F3] p-8 sm:p-12 lg:pl-[8%] lg:pr-[6%]">
         {/* Curva decorativa */}
-        <svg aria-hidden className="hidden lg:block absolute inset-y-0 right-full h-full w-[22vw] max-w-[420px]" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path d="M100,0 L62,0 C34,30 84,52 50,76 C34,88 22,94 6,100 L100,100 Z" fill="#33391F" />
-          <path d="M100,0 L76,0 C52,28 96,54 66,78 C52,88 44,95 38,100 L100,100 Z" fill="#FBF8F3" />
+        <svg aria-hidden className="hidden lg:block absolute inset-y-0 right-[calc(100%-2px)] h-full w-[calc(22vw+2px)] max-w-[422px]" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path d="M101,0 L62,0 C34,30 84,52 50,76 C34,88 22,94 6,100 L101,100 Z" fill="#33391F" />
+          <path d="M101,0 L76,0 C52,28 96,54 66,78 C52,88 44,95 38,100 L101,100 Z" fill="#FBF8F3" />
           {[0, 1, 2, 3].map((i) => (
             <path key={i} d={`M${66 + i * 1.5},0 C${38 + i * 3},${28 + i} ${96 - i * 2},${55 + i} ${64 + i * 2},${79 + i} C${55 + i * 2},88 ${50 + i * 2},95 ${48 + i * 2},100`} fill="none" stroke="#D8B69F" strokeWidth="0.8" vectorEffect="non-scaling-stroke" opacity="0.7" />
           ))}

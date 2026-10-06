@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react';
-import { TrendingUp, TrendingDown, Coins, Clock, PieChart as PieIcon, BarChart3 } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { TrendingUp, TrendingDown, Coins, Clock, PieChart as PieIcon, BarChart3, FileDown, Loader2 } from 'lucide-react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { useData } from '../../data/DataContext';
 import { formatKz } from '../../utils/formatters';
 import { monthLabel, netOfVat, shiftMonth } from '../../utils/finance';
+import { downloadMonthlyReportPdf } from '../../utils/monthlyReportPdf';
 import { computeDre, formatPct, marginPct, isNonPayrollTaxPayment, monthTransactions } from './financeCalc';
-import { Card, Kpi, Empty, SERIES_COLORS, OTHER_COLOR, REVENUE_COLOR, EXPENSE_COLOR } from './ui';
+import { Card, Kpi, Empty, SERIES_COLORS, OTHER_COLOR, REVENUE_COLOR, EXPENSE_COLOR, secondaryBtn } from './ui';
 
 // Categorias com cor fixa no gráfico; as restantes agrupam-se em "Outras"
 const PIE_CATEGORIES = [
@@ -27,6 +28,23 @@ const kzAxis = (v: number) => (Math.abs(v) >= 1_000_000 ? `${(v / 1_000_000).toF
 
 export const SummaryTab: React.FC<{ monthKey: string }> = ({ monthKey }) => {
   const { transactions, payrollRuns, settings } = useData();
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    try {
+      setIsGeneratingPdf(true);
+      await downloadMonthlyReportPdf({
+        monthKey,
+        transactions,
+        payrollRuns,
+        settings,
+      });
+    } catch (err) {
+      console.error('Erro ao gerar relatório mensal em PDF:', err);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   const dre = useMemo(() => computeDre(transactions, payrollRuns, settings, monthKey), [transactions, payrollRuns, settings, monthKey]);
   const s = dre.summary;
@@ -83,6 +101,21 @@ export const SummaryTab: React.FC<{ monthKey: string }> = ({ monthKey }) => {
           className="lg:col-span-2"
           title="Demonstração de Resultados"
           subtitle={`${monthLabel(monthKey)} • regime de caixa (lançamentos pagos), valores sem IVA`}
+          actions={
+            <button
+              onClick={handleDownloadPdf}
+              disabled={isGeneratingPdf}
+              className={secondaryBtn}
+              title="Gerar e descarregar relatório financeiro mensal em formato PDF"
+            >
+              {isGeneratingPdf ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#8C6353]" />
+              ) : (
+                <FileDown className="w-3.5 h-3.5 text-[#8C6353]" />
+              )}
+              <span>{isGeneratingPdf ? 'A gerar...' : 'Exportar PDF'}</span>
+            </button>
+          }
         >
           <div className="space-y-2 text-xs">
             <DreRow label="Receitas brutas (IVA incluído)" value={dre.grossRevenue} strong tone="green" />
