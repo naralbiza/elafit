@@ -28,7 +28,7 @@ import { MemberDetailsModal } from './components/modals/MemberDetailsModal';
 import { ReceiptModal } from './components/modals/ReceiptModal';
 
 const FullScreenMessage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="min-h-screen bg-[#F4F2EE] text-[#2C3228] font-sans flex items-center justify-center p-6 antialiased">
+  <div className="min-h-[100dvh] bg-[#F4F2EE] text-[#2C3228] font-sans flex items-center justify-center p-6 antialiased">
     <div className="max-w-sm text-center flex flex-col items-center">{children}</div>
   </div>
 );
@@ -88,6 +88,7 @@ function Workspace() {
 
   const [activeTab, setActiveTab] = useState<TabType>(allowedTabs[0]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Modais partilhados entre módulos
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
@@ -109,9 +110,9 @@ function Workspace() {
   const openAddTransaction = (initial?: Partial<Transaction>) => setTransactionDraft(initial ?? {});
 
   return (
-    <div className="min-h-screen bg-[#F4F2EE] text-[#2C3228] font-sans flex antialiased selection:bg-[#E8D5C8] selection:text-[#2C3228]">
+    <div className="min-h-[100dvh] bg-[#F4F2EE] text-[#2C3228] font-sans flex antialiased selection:bg-[#E8D5C8] selection:text-[#2C3228]">
       {/* Dark Sidebar Navigation */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} open={menuOpen} onClose={() => setMenuOpen(false)} />
 
       {/* Main Workspace Right Panel */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
@@ -121,16 +122,17 @@ function Workspace() {
           setSearchTerm={setSearchTerm}
           onReloadData={reloadAll}
           onOpenAI={() => goToTab('ai')}
+          onOpenMenu={() => setMenuOpen(true)}
         />
 
         {dataError && (
-          <div className="mx-6 mt-2 p-3 rounded-xl bg-[#FEE2E2] border border-[#FCA5A5] text-xs text-[#991B1B]">
+          <div className="mx-4 sm:mx-6 mt-2 p-3 rounded-xl bg-[#FEE2E2] border border-[#FCA5A5] text-xs text-[#991B1B]">
             {dataError}
           </div>
         )}
 
         {/* Dynamic Viewport */}
-        <main className="flex-1 px-6 pb-8">
+        <main className="flex-1 px-3 sm:px-6 pb-8">
           {activeTab === 'overview' && (
             <OverviewDashboard
               setActiveTab={goToTab}

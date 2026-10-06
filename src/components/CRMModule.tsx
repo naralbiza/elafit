@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Member, LeadStatus, MemberStatus, PlanType } from '../types';
 import { formatKz } from '../utils/formatters';
+import { initials } from './crm/memberShared';
 
 interface CRMModuleProps {
   members: Member[];
@@ -155,60 +156,69 @@ export const CRMModule: React.FC<CRMModuleProps> = ({
 
       {/* SUBTAB 1: KANBAN PIPELINE */}
       {activeSubTab === 'kanban' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 items-start">
           {STAGES.map((stage) => {
             const stageMembers = members.filter((m) => m.leadStatus === stage.id);
+            const stageLabel = stage.label.replace(/^\d+\.\s*/, '');
             return (
-              <div key={stage.id} className="bg-[#FFFFFF] p-4 rounded-2xl border border-[#ECE5DE] shadow-xs flex flex-col h-[600px]">
+              <div key={stage.id} className="rounded-3xl p-3 flex flex-col max-h-[72vh] min-h-[220px]" style={{ backgroundColor: stage.bg + '99' }}>
                 {/* Column Header */}
-                <div className="flex items-center justify-between pb-3 border-b border-[#F0EAFAF] mb-3">
-                  <span className="text-xs font-bold text-[#2C3228]" style={{ color: stage.color }}>
-                    {stage.label}
-                  </span>
-                  <span className="text-xs font-bold bg-[#F4ECE6] text-[#2C3228] px-2 py-0.5 rounded-full">
+                <div className="flex items-center justify-between px-2 pt-1 pb-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0 ring-4 ring-white/70" style={{ backgroundColor: stage.color }} />
+                    <span className="text-[13px] font-bold text-[#2C3228] truncate">{stageLabel}</span>
+                  </div>
+                  <span className="text-[11px] font-bold bg-white text-[#2C3228] min-w-6 h-6 px-2 rounded-full flex items-center justify-center shadow-2xs">
                     {stageMembers.length}
                   </span>
                 </div>
 
                 {/* Member Cards in Column */}
-                <div className="space-y-3 overflow-y-auto flex-1 pr-1 custom-scrollbar">
+                <div className="space-y-2.5 overflow-y-auto flex-1 px-0.5 pb-1 custom-scrollbar">
                   {stageMembers.length === 0 ? (
-                    <div className="text-center py-8 text-xs text-[#A0958C] border-2 border-dashed border-[#F2ECE6] rounded-xl">
+                    <div className="text-center py-8 text-xs text-[#A0958C] border border-dashed border-[#D9D1C7] rounded-2xl bg-white/50">
                       Nenhum contacto neste estágio
                     </div>
                   ) : (
                     stageMembers.map((m) => (
                       <div
                         key={m.id}
-                        className="p-3.5 bg-[#FBF9F6] border border-[#E8E2DC] rounded-xl hover:shadow-sm transition-all relative group cursor-pointer"
+                        className="p-3.5 bg-white border border-white rounded-2xl shadow-[0_1px_2px_rgba(40,44,36,0.04),0_6px_16px_-10px_rgba(40,44,36,0.18)] hover:shadow-[0_2px_4px_rgba(40,44,36,0.05),0_14px_28px_-12px_rgba(40,44,36,0.25)] hover:-translate-y-0.5 transition-all relative group cursor-pointer"
                         onClick={() => onSelectMember(m)}
                       >
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-xs font-bold text-[#2C3228] group-hover:text-[#D0A68D] transition-colors">
-                            {m.name}
-                          </h4>
-                          <span className="text-[10px] bg-[#F4ECE6] text-[#2C3228] px-2 py-0.5 rounded-full font-medium">
-                            {m.plan}
-                          </span>
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0" style={{ backgroundColor: stage.bg, color: stage.color }}>
+                            {initials(m.name)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-[13px] font-bold text-[#2C3228] leading-tight truncate group-hover:text-[#8C6353] transition-colors">
+                              {m.name}
+                            </h4>
+                            <p className="text-[11px] text-[#7A7067] mt-0.5 flex items-center gap-1 truncate">
+                              <Phone className="w-3 h-3 text-[#A0958C] shrink-0" /> <span className="truncate">{m.phone}</span>
+                            </p>
+                          </div>
                         </div>
 
-                        <p className="text-[11px] text-[#7A7067] mt-1 flex items-center gap-1">
-                          <Phone className="w-3 h-3 text-[#A0958C]" /> {m.phone}
-                        </p>
+                        {m.plan && (
+                          <span className="inline-block mt-2.5 text-[10px] bg-[#F7F2EC] text-[#6B5848] px-2.5 py-1 rounded-full font-semibold">
+                            {m.plan}
+                          </span>
+                        )}
 
                         {m.notes && (
-                          <p className="text-[10px] text-[#8C827A] italic mt-2 line-clamp-2 bg-white p-1.5 rounded-md border border-[#F0EAE4]">
-                            "{m.notes}"
+                          <p className="text-[11px] text-[#8C827A] mt-2 line-clamp-2 leading-snug">
+                            {m.notes}
                           </p>
                         )}
 
-                        {/* Move Stage Selector */}
-                        <div className="mt-3 pt-2 border-t border-[#ECE5DE] flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
+                        {/* Actions */}
+                        <div className="mt-3 pt-2.5 border-t border-[#F1ECE6] flex items-center justify-between gap-2" onClick={(e) => e.stopPropagation()}>
                           <a
                             href={`https://wa.me/${m.phone.replace(/[^0-9]/g, '')}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-[10px] font-semibold text-[#166534] bg-[#DCFCE7] px-2 py-1 rounded-lg flex items-center gap-1 hover:bg-[#BBF7D0]"
+                            className="text-[10px] font-semibold text-[#166534] bg-[#E8F6EC] px-2.5 py-1.5 rounded-full flex items-center gap-1 hover:bg-[#D3EEDB] transition-colors shrink-0"
                           >
                             <MessageSquare className="w-3 h-3" /> WhatsApp
                           </a>
@@ -216,11 +226,11 @@ export const CRMModule: React.FC<CRMModuleProps> = ({
                           <select
                             value={m.leadStatus}
                             onChange={(e) => handleStageChange(m, e.target.value as LeadStatus)}
-                            className="text-[10px] bg-white border border-[#E2DAD1] rounded-md px-1.5 py-1 text-[#2C3228] focus:outline-none"
+                            className="text-[10px] min-w-0 bg-[#FAF8F5] border border-[#EAE4DC] rounded-full px-2 py-1.5 text-[#2C3228] focus:outline-none focus:border-[#D0A68D]"
                           >
                             {STAGES.map((s) => (
                               <option key={s.id} value={s.id}>
-                                Move: {s.label.split('.')[1]}
+                                Mover: {s.label.replace(/^\d+\.\s*/, '')}
                               </option>
                             ))}
                           </select>

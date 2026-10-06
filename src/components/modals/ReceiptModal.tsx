@@ -71,7 +71,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
 
           {/* Service Details Table */}
           <div className="border border-[#ECE5DE] rounded-xl overflow-hidden">
-            <table className="w-full text-left">
+            <div className="overflow-x-auto"><table className="w-full text-left min-w-[420px]">
               <thead className="bg-[#F4ECE6] text-[#2C3228] font-bold text-[10px] uppercase">
                 <tr>
                   <th className="p-3">Descrição do Serviço</th>
@@ -88,7 +88,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
                   </td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           {/* Legal / IVA Notice */}

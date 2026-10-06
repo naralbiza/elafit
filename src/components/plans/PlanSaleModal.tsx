@@ -203,7 +203,7 @@ export const PlanSaleModal: React.FC<PlanSaleModalProps> = ({
           )}
 
           {showTx && (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className={labelCls}>Pagamento</label>
                 <select value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value as PaymentStatus)} className={inputCls}>

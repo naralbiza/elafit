@@ -153,7 +153,7 @@ export const MemberDetailsModal: React.FC<MemberDetailsModalProps> = ({
           {showEvalForm && (
             <form onSubmit={handleAddEvaluation} className="p-4 bg-[#FBF9F6] border border-[#E2DAD1] rounded-2xl space-y-3 text-xs mb-4">
               <h5 className="font-bold text-[#2C3228]">Registar Nova Avaliação Física</h5>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block mb-1 font-bold">Peso (Kg):</label>
                   <input

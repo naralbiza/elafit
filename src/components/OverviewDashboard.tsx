@@ -7,7 +7,6 @@ import {
   ChevronRight,
   UserCheck,
   CreditCard,
-  Target,
   CheckCircle2,
   Circle,
   UserPlus,
@@ -18,8 +17,8 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   PieChart,
   Pie,
   Cell,
@@ -216,203 +215,200 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
 
   const shownStaff = staff.slice(0, 5);
 
+  const kpis = [
+    {
+      key: 'active',
+      label: 'Clientes Ativas',
+      value: String(stats.activeCount),
+      icon: Users,
+      tint: 'from-[#F9EDE6] to-[#F3DDD1]',
+      iconColor: 'text-[#8C6353]',
+      footer: <ChangeBadge curr={stats.activeCount} prev={stats.activePrev} pill />,
+      note: 'vs mês anterior',
+    },
+    {
+      key: 'revenue',
+      label: 'Receita do Mês',
+      value: formatKz(stats.revenue),
+      icon: TrendingUp,
+      tint: 'from-[#E9F3ED] to-[#D6E9DD]',
+      iconColor: 'text-[#3A6B4C]',
+      footer: <ChangeBadge curr={stats.revenue} prev={stats.revenuePrev} pill />,
+      note: 'vs mês anterior',
+    },
+    {
+      key: 'classes',
+      label: 'Aulas Realizadas',
+      value: String(stats.classesDone),
+      icon: Dumbbell,
+      tint: 'from-[#F6EEE3] to-[#EEDFC9]',
+      iconColor: 'text-[#9A7442]',
+      footer: <ChangeBadge curr={stats.classesDone} prev={stats.classesDonePrev} pill />,
+      note: 'vs mês anterior',
+    },
+    {
+      key: 'retention',
+      label: 'Taxa de Retenção',
+      value: stats.retentionBase > 0 ? `${stats.retention}%` : '—',
+      icon: Heart,
+      tint: 'from-[#FCEEED] to-[#F7DAD7]',
+      iconColor: 'text-[#C85252]',
+      footer:
+        settings.goalRetentionRate > 0 && stats.retentionBase > 0 ? (
+          <span
+            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              stats.retention >= settings.goalRetentionRate ? 'bg-[#E6F0EB] text-[#3A6B4C]' : 'bg-[#FDECEB] text-[#C85252]'
+            }`}
+          >
+            Meta {settings.goalRetentionRate}%
+          </span>
+        ) : null,
+      note: stats.retentionBase > 0 ? `${stats.counts.ativa} de ${stats.retentionBase} alunas` : 'sem alunas registadas',
+    },
+  ];
+
+  const quickLinks = [
+    { tab: 'crm' as TabType, icon: Users, title: 'Acompanhar Clientes', desc: 'Evolução e resultados' },
+    { tab: 'hr' as TabType, icon: UserCheck, title: 'Gerir Equipa', desc: 'Instrutoras e colaboradores' },
+    { tab: 'finance' as TabType, icon: CreditCard, title: 'Controlar Finanças', desc: 'Receitas, despesas e lucros' },
+    { tab: 'ai' as TabType, icon: Compass, title: 'Inteligência Estratégica', desc: 'Conselho e auditoria de gestão' },
+  ];
+
+  const tooltipStyle = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '12px',
+    fontSize: '11px',
+    border: '1px solid #EFE9E1',
+    boxShadow: '0 10px 30px -12px rgba(40,44,36,0.25)',
+  };
+
+  const CardHead: React.FC<{ title: string; hint?: React.ReactNode; action?: { label: string; onClick: () => void } }> = ({ title, hint, action }) => (
+    <div className="flex items-center justify-between gap-3 mb-4">
+      <div className="min-w-0">
+        <h3 className="font-serif text-[15px] font-bold text-[#2C3228] truncate">{title}</h3>
+        {hint && <p className="text-[10px] text-[#A0958C] font-medium mt-0.5">{hint}</p>}
+      </div>
+      {action && (
+        <button onClick={action.onClick} className="text-[11px] font-semibold text-[#8C6353] hover:text-[#2C3228] shrink-0 transition-colors">
+          {action.label} &rarr;
+        </button>
+      )}
+    </div>
+  );
+
   return (
-    <div className="space-y-6 pb-8">
-      {/* 1. Greeting Row */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-1">
+    <div className="space-y-5 sm:space-y-6 pb-8">
+      {/* 1. Greeting */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pt-1">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-[#2C3228] flex items-center gap-2">
-            {name ? `Bem-vinda, ${name}!` : 'Bem-vinda!'} <span className="inline-block animate-bounce">👋</span>
+          <p className="eyebrow">{dateLabel}</p>
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#2C3228] mt-1">
+            {name ? `Bem-vinda, ${name}!` : 'Bem-vinda!'}
           </h1>
-          <p className="text-xs text-[#7A7067] mt-1 font-medium">Aqui estás a construir mulheres mais fortes e confiantes.</p>
+          <p className="text-xs text-[#7A7067] mt-1.5 font-medium">Aqui estás a construir mulheres mais fortes e confiantes.</p>
         </div>
 
-        <div className="flex items-center gap-4">
-          <p className="hidden lg:block font-serif italic text-lg text-[#8A7869] select-none" style={{ fontFamily: "'Caveat', cursive" }}>
-            Disciplina hoje, resultados sempre! ♡
-          </p>
-
-          <div className="hidden sm:flex items-center gap-2">
-            {hasModule('crm') && (
-              <button
-                onClick={onOpenAddMember}
-                className="px-3 py-2 bg-[#2C3228] text-white hover:bg-[#3E4639] rounded-xl text-[11px] font-semibold flex items-center gap-1.5"
-              >
-                <UserPlus className="w-3.5 h-3.5 text-[#D0A68D]" /> Nova aluna
-              </button>
-            )}
-            {hasModule('finance') && (
-              <button
-                onClick={onOpenAddTransaction}
-                className="px-3 py-2 bg-[#F3DBD1] text-[#2C3228] hover:bg-[#EACFC4] rounded-xl text-[11px] font-semibold flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" /> Lançamento
-              </button>
-            )}
-          </div>
-
-          <div className="bg-[#EFECE8] border border-[#E2DDD7] px-4 py-2 rounded-2xl text-center shadow-2xs">
-            <p className="text-[10px] font-semibold text-[#8C827A] uppercase tracking-wider">{dateLabel}</p>
-            <p className="text-sm font-bold text-[#2C3228]">{timeLabel}</p>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {hasModule('crm') && (
+            <button
+              onClick={onOpenAddMember}
+              className="px-4 py-2.5 bg-gradient-to-b from-[#363A2D] to-[#24271D] text-white hover:brightness-110 rounded-full text-[11px] font-semibold flex items-center gap-1.5 shadow-[0_8px_18px_-8px_rgba(36,39,29,0.7)] transition-all"
+            >
+              <UserPlus className="w-3.5 h-3.5 text-[#D0A68D]" /> Nova aluna
+            </button>
+          )}
+          {hasModule('finance') && (
+            <button
+              onClick={onOpenAddTransaction}
+              className="px-4 py-2.5 bg-white border border-[#EADFD6] text-[#2C3228] hover:bg-[#FBF6F2] rounded-full text-[11px] font-semibold flex items-center gap-1.5 shadow-2xs transition-all"
+            >
+              <Plus className="w-3.5 h-3.5 text-[#8C6353]" /> Lançamento
+            </button>
+          )}
+          <div className="bg-white/80 border border-[#EADFD6] px-4 py-2 rounded-full text-sm font-bold text-[#2C3228] shadow-2xs">
+            {timeLabel}
           </div>
         </div>
       </div>
 
       {/* 2. KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="surface-panel p-4.5 flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-[#F7ECE6] flex items-center justify-center shrink-0">
-              <Users className="w-5 h-5 text-[#8C6353]" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {kpis.map(({ key, label, value, icon: Icon, tint, iconColor, footer, note }) => (
+          <div key={key} className="surface-panel surface-panel-hover p-5">
+            <div className="flex items-start justify-between">
+              <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${tint} flex items-center justify-center`}>
+                <Icon className={`w-5 h-5 ${iconColor}`} />
+              </div>
+              {footer}
             </div>
-            <div>
-              <p className="text-[11px] font-medium text-[#8C827A]">Clientes Ativas</p>
-              <h3 className="font-serif text-2xl font-bold text-[#2C3228] leading-tight">{stats.activeCount}</h3>
-            </div>
+            <p className="text-[11px] font-semibold text-[#8C827A] mt-4">{label}</p>
+            <h3 className="font-serif text-[26px] font-bold text-[#2C3228] leading-tight mt-0.5 truncate">{value}</h3>
+            <p className="text-[10px] text-[#A09890] mt-1">{note}</p>
           </div>
-          <div className="text-right">
-            <ChangeBadge curr={stats.activeCount} prev={stats.activePrev} />
-            <span className="text-[9px] text-[#A09890] block">vs mês anterior</span>
-          </div>
-        </div>
-
-        <div className="surface-panel p-4.5 flex items-center justify-between">
-          <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-12 h-12 rounded-full bg-[#E6F0EB] flex items-center justify-center shrink-0">
-              <TrendingUp className="w-5 h-5 text-[#3A6B4C]" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-[#8C827A]">Receita do Mês</p>
-              <h3 className="font-serif text-xl font-bold text-[#2C3228] leading-tight truncate">{formatKz(stats.revenue)}</h3>
-            </div>
-          </div>
-          <div className="text-right shrink-0">
-            <ChangeBadge curr={stats.revenue} prev={stats.revenuePrev} />
-            <span className="text-[9px] text-[#A09890] block">vs mês anterior</span>
-          </div>
-        </div>
-
-        <div className="surface-panel p-4.5 flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-[#F5ECE5] flex items-center justify-center shrink-0">
-              <Dumbbell className="w-5 h-5 text-[#8C6353]" />
-            </div>
-            <div>
-              <p className="text-[11px] font-medium text-[#8C827A]">Aulas Realizadas</p>
-              <h3 className="font-serif text-2xl font-bold text-[#2C3228] leading-tight">{stats.classesDone}</h3>
-            </div>
-          </div>
-          <div className="text-right">
-            <ChangeBadge curr={stats.classesDone} prev={stats.classesDonePrev} />
-            <span className="text-[9px] text-[#A09890] block">vs mês anterior</span>
-          </div>
-        </div>
-
-        <div className="surface-panel p-4.5 flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-[#FDECEB] flex items-center justify-center shrink-0">
-              <Heart className="w-5 h-5 text-[#C85252]" />
-            </div>
-            <div>
-              <p className="text-[11px] font-medium text-[#8C827A]">Taxa de Retenção</p>
-              <h3 className="font-serif text-2xl font-bold text-[#2C3228] leading-tight">
-                {stats.retentionBase > 0 ? `${stats.retention}%` : '—'}
-              </h3>
-            </div>
-          </div>
-          <div className="text-right">
-            {settings.goalRetentionRate > 0 && stats.retentionBase > 0 && (
-              <span
-                className={`text-[10px] font-bold block ${stats.retention >= settings.goalRetentionRate ? 'text-[#3A6B4C]' : 'text-[#C85252]'}`}
-              >
-                Meta {settings.goalRetentionRate}%
-              </span>
-            )}
-            <span className="text-[9px] text-[#A09890] block">
-              {stats.retentionBase > 0 ? `${stats.counts.ativa} de ${stats.retentionBase} alunas` : 'sem alunas registadas'}
-            </span>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* 3. Hero Banner + Quick Actions + Today's Schedule */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-        <div className="lg:col-span-8 surface-panel p-2 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
-          <div className="md:col-span-7 relative rounded-lg overflow-hidden min-h-[250px] flex flex-col justify-end p-7">
-            <img
-              src="/dashboard-community.webp"
-              alt="Corpo saudável, mente mais forte"
-              className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.62]"
-            />
-            <img
-              src="/brand-sign.webp"
-              alt="Ela Fit — Ao Seu Ritmo"
-              className="absolute top-3 right-3 w-16 h-16 rounded-full object-cover border border-white/50 shadow-lg"
-            />
-            <div className="relative z-10 space-y-3">
-              <h2 className="font-serif text-2xl font-bold text-white max-w-xs leading-snug drop-shadow-md">
-                Corpo saudável, mente mais forte.
-              </h2>
-              <button
-                onClick={() => setActiveTab('agenda')}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#F2DCD3] hover:bg-[#EACFC4] text-[#2C3228] text-xs font-bold rounded-full transition-all shadow-sm"
-              >
-                <span>Ver agenda de aulas</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
+      {/* 3. Receitas vs Despesas + Aulas de Hoje */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div className="lg:col-span-8 surface-panel p-5 sm:p-6 flex flex-col">
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
+            <div>
+              <h3 className="font-serif text-[15px] font-bold text-[#2C3228]">Receitas vs Despesas</h3>
+              <p className="text-[10px] text-[#A0958C] font-medium mt-0.5">Últimos 9 meses (M Kz)</p>
+            </div>
+            <div className="flex items-center gap-4 text-[11px] font-medium text-[#7A7067]">
+              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#3A6B4C]" />Receitas</span>
+              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#E8A5A5]" />Despesas</span>
             </div>
           </div>
-
-          <div className="md:col-span-5 p-4 flex flex-col justify-center space-y-3 divide-y divide-[#F2ECE6]">
-            {[
-              { tab: 'crm' as TabType, icon: Users, title: 'Acompanhar Clientes', desc: 'Evolução e resultados' },
-              { tab: 'hr' as TabType, icon: UserCheck, title: 'Gerir Equipa', desc: 'Instrutoras e colaboradores' },
-              { tab: 'finance' as TabType, icon: CreditCard, title: 'Controlar Finanças', desc: 'Receitas, despesas e lucros' },
-              { tab: 'ai' as TabType, icon: Compass, title: 'Inteligência Estratégica', desc: 'Conselho e auditoria de gestão' },
-            ].map(({ tab, icon: Icon, title, desc }) => (
-              <div
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className="pt-2 first:pt-0 flex items-center gap-3 cursor-pointer group hover:bg-[#FDFBF7] p-1.5 rounded-xl transition-all"
-              >
-                <div className="w-9 h-9 rounded-full bg-[#F4ECE6] flex items-center justify-center shrink-0 group-hover:bg-[#2C3228] group-hover:text-white transition-colors">
-                  <Icon className="w-4 h-4 text-[#2C3228] group-hover:text-white" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-[#2C3228]">{title}</p>
-                  <p className="text-[10px] text-[#8C827A]">{desc}</p>
-                </div>
-              </div>
-            ))}
+          <div className="h-60 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={series} margin={{ top: 10, right: 5, left: -22, bottom: 0 }} barGap={4} barCategoryGap="28%">
+                <defs>
+                  <linearGradient id="gRev" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4C8A64" />
+                    <stop offset="100%" stopColor="#2F5E43" />
+                  </linearGradient>
+                  <linearGradient id="gExp" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#F0B9B4" />
+                    <stop offset="100%" stopColor="#E39A98" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="2 6" vertical={false} stroke="#EDE7DF" />
+                <XAxis dataKey="month" stroke="#A09890" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="#A09890" fontSize={10} tickLine={false} axisLine={false} />
+                <Tooltip
+                  cursor={{ fill: 'rgba(216,182,159,0.12)' }}
+                  contentStyle={tooltipStyle}
+                  formatter={(value: any, name: any) => [fmtM(Number(value)), name]}
+                />
+                <Bar dataKey="Receitas" fill="url(#gRev)" radius={[8, 8, 3, 3]} />
+                <Bar dataKey="Despesas" fill="url(#gExp)" radius={[8, 8, 3, 3]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="lg:col-span-4 surface-panel p-5 flex flex-col">
-          <div className="flex items-center justify-between pb-3 border-b border-[#F2ECE6]">
-            <h3 className="font-serif text-base font-bold text-[#2C3228]">Aulas de Hoje</h3>
-            <button onClick={() => setActiveTab('agenda')} className="text-[11px] font-semibold text-[#8C6353] hover:underline flex items-center gap-0.5">
-              Ver agenda &rarr;
-            </button>
-          </div>
-
-          <div className="space-y-3 mt-3 overflow-y-auto max-h-[240px] custom-scrollbar">
+        <div className="lg:col-span-4 surface-panel p-5 sm:p-6 flex flex-col">
+          <CardHead title="Aulas de Hoje" hint={`${todayClasses.length} ${todayClasses.length === 1 ? 'aula' : 'aulas'}`} action={{ label: 'Ver agenda', onClick: () => setActiveTab('agenda') }} />
+          <div className="space-y-1.5 overflow-y-auto max-h-[250px] pr-1 custom-scrollbar flex-1">
             {todayClasses.length === 0 ? (
-              <p className="text-center text-xs text-[#A0958C] py-10">Não há aulas marcadas para hoje.</p>
+              <p className="text-center text-xs text-[#A0958C] py-12">Não há aulas marcadas para hoje.</p>
             ) : (
               todayClasses.map((item) => (
-                <div key={item.id} className="flex items-center justify-between text-xs p-2 rounded-xl hover:bg-[#FAF8F5] transition-colors">
+                <div key={item.id} className="flex items-center justify-between gap-2 text-xs p-2.5 rounded-2xl hover:bg-[#FAF7F3] transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="text-[10px] font-bold text-[#8C827A] w-10 text-right leading-tight shrink-0">
+                    <div className="text-[10px] font-bold text-[#6B645B] w-10 text-right leading-tight shrink-0">
                       <div>{item.start}</div>
                       <div className="font-normal text-[#B0A8A0]">{item.end}</div>
                     </div>
-                    <div className="w-1 h-8 rounded-full shrink-0" style={{ backgroundColor: item.color || '#E5BDB0' }} />
+                    <div className="w-1 h-9 rounded-full shrink-0" style={{ backgroundColor: item.color || '#E5BDB0' }} />
                     <div className="min-w-0">
                       <p className="font-bold text-[#2C3228] truncate">{item.title}</p>
                       <p className="text-[10px] text-[#8C827A] truncate">{item.instructor}</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold bg-[#FDECEB] text-[#8C5252] px-2 py-0.5 rounded-full shrink-0">{item.occupancy}</span>
+                  <span className="text-[10px] font-bold bg-[#FBEFEC] text-[#8C5252] px-2.5 py-1 rounded-full shrink-0">{item.occupancy}</span>
                 </div>
               ))
             )}
@@ -420,116 +416,143 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
         </div>
       </div>
 
-      {/* 4. Charts & Recent Clients */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-[#ECE8E3] shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-serif text-sm font-bold text-[#2C3228]">Receitas vs Despesas</h3>
-            <span className="text-[10px] text-[#8C827A] font-medium">Últimos 9 meses (M Kz)</span>
-          </div>
-
-          <div className="h-48 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={series} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2ECE6" />
-                <XAxis dataKey="month" stroke="#A09890" fontSize={10} tickLine={false} />
-                <YAxis stroke="#A09890" fontSize={10} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#FFFFFF', borderRadius: '10px', fontSize: '11px' }}
-                  formatter={(value: any, name: any) => [fmtM(Number(value)), name]}
-                />
-                <Bar dataKey="Receitas" fill="#3A6B4C" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Despesas" fill="#E8A5A5" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="flex items-center justify-center gap-4 mt-2 text-[11px] font-medium text-[#7A7067]">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#3A6B4C]"></span>
-              <span>Receitas</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#E8A5A5]"></span>
-              <span>Despesas</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-[#ECE8E3] shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <h3 className="font-serif text-sm font-bold text-[#2C3228]">Novas Clientes</h3>
-              <ChangeBadge curr={newThisMonth} prev={newPrevMonth} pill />
-            </div>
-            <span className="text-[10px] text-[#8C827A] font-medium">Últimos 9 meses</span>
-          </div>
-
-          <div className="h-48 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={series} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F2ECE6" />
-                <XAxis dataKey="month" stroke="#A09890" fontSize={10} tickLine={false} />
-                <YAxis stroke="#A09890" fontSize={10} tickLine={false} allowDecimals={false} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#FFFFFF', borderRadius: '10px', fontSize: '11px' }}
-                  formatter={(value: any) => [value, 'Novas clientes']}
-                />
-                <Line type="monotone" dataKey="clientes" stroke="#E29587" strokeWidth={2.5} dot={{ r: 3, fill: '#E29587' }} activeDot={{ r: 5 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-[#ECE8E3] shadow-xs flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-[#F2ECE6]">
-              <h3 className="font-serif text-sm font-bold text-[#2C3228]">Últimas Clientes Cadastradas</h3>
-              <button onClick={() => setActiveTab('crm')} className="text-[11px] font-semibold text-[#8C6353] hover:underline">
-                Ver todas &rarr;
+      {/* 4. Hero + atalhos + Metas */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <div className="lg:col-span-8 surface-panel p-2.5 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+          <div className="md:col-span-7 relative rounded-2xl overflow-hidden min-h-[240px] flex flex-col justify-end p-6 sm:p-7">
+            <img
+              src="/dashboard-community.webp"
+              alt="Corpo saudável, mente mais forte"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#14150e]/85 via-[#14150e]/35 to-[#14150e]/10" />
+            <img
+              src="/brand-sign.webp"
+              alt="Ela Fit — Ao Seu Ritmo"
+              className="absolute top-4 right-4 w-14 h-14 rounded-full object-cover border border-white/50 shadow-lg"
+            />
+            <div className="relative z-10 space-y-3">
+              <h2 className="font-serif text-2xl font-bold text-white max-w-xs leading-snug drop-shadow-md">
+                Corpo saudável, mente mais forte.
+              </h2>
+              <button
+                onClick={() => setActiveTab('agenda')}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#F5E3DA] hover:bg-white text-[#2C3228] text-xs font-bold rounded-full transition-all shadow-sm"
+              >
+                <span>Ver agenda de aulas</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
-
-            <div className="space-y-2.5 mt-3">
-              {recentMembers.length === 0 ? (
-                <p className="text-center text-xs text-[#A0958C] py-8">Ainda não há clientes registadas.</p>
-              ) : (
-                recentMembers.map((m) => (
-                  <div key={m.id} className="flex items-center justify-between text-xs py-1.5 border-b border-[#F7F5F0] last:border-0">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-full bg-[#F4ECE6] border border-[#E2DDD7] flex items-center justify-center text-[10px] font-bold text-[#8C6353] shrink-0">
-                        {initials(m.name)}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-[#2C3228] leading-tight truncate">{m.name}</p>
-                        <p className="text-[10px] text-[#8C827A] truncate">{m.plan || 'Sem plano'}</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] text-[#A09890] shrink-0">{createdLabel(m.createdAt)}</span>
-                  </div>
-                ))
-              )}
-            </div>
           </div>
 
-          <p className="text-center font-serif italic text-sm text-[#8A7869] pt-3 select-none" style={{ fontFamily: "'Caveat', cursive" }}>
-            "Mulheres que se cuidam, inspiram outras mulheres." ♡
-          </p>
+          <div className="md:col-span-5 p-3 sm:p-4 flex flex-col justify-center gap-1">
+            {quickLinks.map(({ tab, icon: Icon, title, desc }) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className="w-full text-left flex items-center gap-3 group hover:bg-[#FAF7F3] p-2.5 rounded-2xl transition-all"
+              >
+                <div className="w-10 h-10 rounded-2xl bg-[#F7EFE9] flex items-center justify-center shrink-0 group-hover:bg-[#2C3228] transition-colors">
+                  <Icon className="w-4 h-4 text-[#8C6353] group-hover:text-white transition-colors" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold text-[#2C3228] truncate">{title}</p>
+                  <p className="text-[10px] text-[#8C827A] truncate">{desc}</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-[#CFC6BC] group-hover:text-[#8C6353] group-hover:translate-x-0.5 transition-all shrink-0" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="lg:col-span-4 surface-panel p-5 sm:p-6">
+          <CardHead title="Metas do Mês" action={{ label: 'Relatórios', onClick: () => setActiveTab('reports') }} />
+          <div className="space-y-5 text-xs">
+            {goals.length === 0 && <p className="text-[#A0958C] text-center py-6">Sem metas definidas nas configurações.</p>}
+            {goals.map((g) => {
+              const reached = g.pct >= 100;
+              const Icon = reached ? CheckCircle2 : Circle;
+              return (
+                <div key={g.label}>
+                  <div className="flex items-center justify-between mb-2 gap-2">
+                    <span className="flex items-center gap-1.5 font-semibold text-[#2C3228] min-w-0">
+                      <Icon className={`w-3.5 h-3.5 shrink-0 ${reached ? 'text-[#3A6B4C]' : 'text-[#D0A68D]'}`} />
+                      <span className="truncate">{g.label}</span>
+                    </span>
+                    <span className="font-bold text-[#7A7067] shrink-0 text-[11px]">{g.value}</span>
+                  </div>
+                  <div className="w-full bg-[#F1EDE8] h-2 rounded-full overflow-hidden">
+                    <div
+                      className={`${reached ? 'bg-gradient-to-r from-[#4C8A64] to-[#2F5E43]' : 'bg-gradient-to-r from-[#E6C4AE] to-[#D0A68D]'} h-full rounded-full transition-all duration-700`}
+                      style={{ width: `${Math.max(0, Math.min(100, g.pct))}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* 5. Estado dos Planos, Colaboradoras, Metas do Mês */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-[#ECE8E3] shadow-xs">
-          <h3 className="font-serif text-sm font-bold text-[#2C3228] mb-2">Estado dos Planos</h3>
+      {/* 5. Clientes, estado dos planos e equipa */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+        <div className="surface-panel p-5 sm:p-6 flex flex-col">
+          <CardHead title="Novas Clientes" hint="Últimos 9 meses" action={undefined} />
+          <div className="flex items-baseline gap-2 -mt-2 mb-2">
+            <span className="font-serif text-3xl font-bold text-[#2C3228]">{newThisMonth}</span>
+            <ChangeBadge curr={newThisMonth} prev={newPrevMonth} pill />
+          </div>
+          <div className="h-36 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={series} margin={{ top: 8, right: 8, left: -30, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="gNew" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#E29587" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="#E29587" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="month" stroke="#A09890" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="#A09890" fontSize={10} tickLine={false} axisLine={false} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(value: any) => [value, 'Novas clientes']} />
+                <Area type="monotone" dataKey="clientes" stroke="#E29587" strokeWidth={2.5} fill="url(#gNew)" dot={false} activeDot={{ r: 5 }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-          <div className="flex items-center justify-between gap-2">
-            <div className="space-y-1.5 text-[11px] text-[#7A7067]">
+        <div className="surface-panel p-5 sm:p-6 flex flex-col">
+          <CardHead title="Últimas Clientes" action={{ label: 'Ver todas', onClick: () => setActiveTab('crm') }} />
+          <div className="space-y-1 flex-1">
+            {recentMembers.length === 0 ? (
+              <p className="text-center text-xs text-[#A0958C] py-8">Ainda não há clientes registadas.</p>
+            ) : (
+              recentMembers.map((m) => (
+                <div key={m.id} className="flex items-center justify-between gap-2 text-xs p-2 rounded-2xl hover:bg-[#FAF7F3] transition-colors">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#F9EDE6] to-[#F0DACC] flex items-center justify-center text-[10px] font-bold text-[#8C6353] shrink-0">
+                      {initials(m.name)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-[#2C3228] leading-tight truncate">{m.name}</p>
+                      <p className="text-[10px] text-[#8C827A] truncate">{m.plan || 'Sem plano'}</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-[#A09890] shrink-0">{createdLabel(m.createdAt)}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="surface-panel p-5 sm:p-6">
+          <CardHead title="Estado dos Planos" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="space-y-2.5 text-[11px] text-[#7A7067] min-w-0 flex-1">
               {statusData.map((item) => (
                 <div key={item.name} className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span>{item.name}</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className="truncate">{item.name}</span>
                   </div>
                   <span className="font-bold text-[#2C3228]">
                     {totalMembers > 0 ? Math.round((item.value / totalMembers) * 100) : 0}%
@@ -545,9 +568,11 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
                     data={totalMembers > 0 ? statusData : [{ name: 'Sem dados', value: 1, color: '#EFECE8' }]}
                     cx="50%"
                     cy="50%"
-                    innerRadius={32}
-                    outerRadius={50}
-                    paddingAngle={totalMembers > 0 ? 3 : 0}
+                    innerRadius={38}
+                    outerRadius={54}
+                    paddingAngle={totalMembers > 0 ? 4 : 0}
+                    cornerRadius={6}
+                    stroke="none"
                     dataKey="value"
                     isAnimationActive={false}
                   >
@@ -558,30 +583,26 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                <span className="font-bold text-sm text-[#2C3228] leading-tight">{totalMembers}</span>
+                <span className="font-serif font-bold text-lg text-[#2C3228] leading-tight">{totalMembers}</span>
                 <span className="text-[9px] text-[#8C827A]">clientes</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-[#ECE8E3] shadow-xs flex flex-col justify-between">
+        <div className="surface-panel p-5 sm:p-6 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-serif text-sm font-bold text-[#2C3228]">Colaboradoras</h3>
-              <span className="text-xs text-[#8C827A]">Total: {staff.length}</span>
-            </div>
-
+            <CardHead title="Colaboradoras" hint={`Total: ${staff.length}`} />
             <div className="flex items-center justify-center py-3">
               {staff.length === 0 ? (
                 <p className="text-xs text-[#A0958C]">Sem colaboradoras registadas.</p>
               ) : (
-                <div className="flex -space-x-2 overflow-hidden">
+                <div className="flex -space-x-2.5">
                   {shownStaff.map((s) =>
                     s.avatarUrl ? (
                       <img
                         key={s.id}
-                        className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover"
+                        className="inline-block h-11 w-11 rounded-full ring-2 ring-white object-cover shadow-sm"
                         src={s.avatarUrl}
                         alt={s.name}
                         title={`${s.name} — ${s.role}`}
@@ -590,14 +611,14 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
                       <div
                         key={s.id}
                         title={`${s.name} — ${s.role}`}
-                        className="inline-flex items-center justify-center h-10 w-10 rounded-full ring-2 ring-white bg-[#F4ECE6] text-xs font-bold text-[#8C6353]"
+                        className="inline-flex items-center justify-center h-11 w-11 rounded-full ring-2 ring-white bg-gradient-to-br from-[#F9EDE6] to-[#F0DACC] text-xs font-bold text-[#8C6353] shadow-sm"
                       >
                         {initials(s.name)}
                       </div>
                     )
                   )}
                   {staff.length > shownStaff.length && (
-                    <div className="inline-flex items-center justify-center h-10 w-10 rounded-full ring-2 ring-white bg-[#EFECE8] text-xs font-bold text-[#8C827A]">
+                    <div className="inline-flex items-center justify-center h-11 w-11 rounded-full ring-2 ring-white bg-[#EFECE8] text-xs font-bold text-[#8C827A]">
                       +{staff.length - shownStaff.length}
                     </div>
                   )}
@@ -608,48 +629,17 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ setActiveT
 
           <button
             onClick={() => setActiveTab('hr')}
-            className="w-full py-2 bg-[#F3DBD1] hover:bg-[#EACFC4] text-[#2C3228] text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center gap-1.5"
+            className="w-full py-2.5 bg-[#F7EFE9] hover:bg-[#F0E2D8] text-[#2C3228] text-xs font-bold rounded-full transition-all text-center flex items-center justify-center gap-1.5"
           >
             <span>Gerir equipa</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
-
-        <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-[#ECE8E3] shadow-xs flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-serif text-sm font-bold text-[#2C3228]">Metas do Mês</h3>
-              <button onClick={() => setActiveTab('reports')} className="text-[11px] text-[#8C6353] font-semibold hover:underline">
-                Relatórios &rarr;
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              {goals.length === 0 && <p className="text-[#A0958C] text-center py-6">Sem metas definidas nas configurações.</p>}
-              {goals.map((g) => {
-                const reached = g.pct >= 100;
-                const Icon = reached ? CheckCircle2 : Circle;
-                return (
-                  <div key={g.label}>
-                    <div className="flex items-center justify-between mb-1 gap-2">
-                      <span className="flex items-center gap-1.5 font-medium text-[#2C3228]">
-                        <Icon className={`w-3.5 h-3.5 ${reached ? 'text-[#3A6B4C]' : 'text-[#D0A68D]'}`} /> {g.label}
-                      </span>
-                      <span className="font-bold text-[#7A7067] shrink-0">{g.value}</span>
-                    </div>
-                    <div className="w-full bg-[#EFECE8] h-2 rounded-full overflow-hidden">
-                      <div
-                        className={`${reached ? 'bg-[#3A6B4C]' : 'bg-[#D0A68D]'} h-full rounded-full transition-all`}
-                        style={{ width: `${Math.max(0, Math.min(100, g.pct))}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
       </div>
+
+      <p className="text-center text-base text-[#8A7869] pt-2 select-none" style={{ fontFamily: "'Caveat', cursive" }}>
+        Disciplina hoje, resultados sempre! ♡
+      </p>
     </div>
   );
 };

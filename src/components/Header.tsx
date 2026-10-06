@@ -6,6 +6,7 @@ import {
   RotateCcw,
   X,
   LogOut,
+  Menu,
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
@@ -15,6 +16,7 @@ interface HeaderProps {
   setSearchTerm: (term: string) => void;
   onReloadData: () => void;
   onOpenAI: () => void;
+  onOpenMenu: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,6 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   setSearchTerm,
   onReloadData,
   onOpenAI: _onOpenAI,
+  onOpenMenu,
 }) => {
   const { profile, signOut } = useAuth();
   const [showLogoModal, setShowLogoModal] = useState(false);
@@ -31,13 +34,14 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="bg-[#F4F2EC]/90 backdrop-blur-md sticky top-0 z-20 pt-4 pb-3.5 px-8 flex items-center justify-between gap-4 border-b border-[#E2DDD5] shadow-2xs">
+      <header className="bg-[#F4F2EC]/90 backdrop-blur-md sticky top-0 z-20 pt-3 pb-3 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4 border-b border-[#E2DDD5] shadow-2xs">
         {/* Search Input Bar with Solid Background and Shortcut Pill */}
-        <div className="relative flex-1 max-w-lg">
+        <button onClick={onOpenMenu} className="lg:hidden p-2 -ml-1 rounded-xl text-[#2A2C24] hover:bg-white border border-transparent hover:border-[#DDD7CD] shrink-0" aria-label="Abrir menu"><Menu className="w-5 h-5" /></button>
+        <div className="relative flex-1 min-w-0 max-w-lg">
           <Search className="w-4 h-4 absolute left-3.5 top-2.5 text-[#8C847A]" />
           <input
             type="text"
-            placeholder="Pesquisar alunas, planos, horários, transações..."
+            placeholder="Pesquisar..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-12 py-2 bg-white border border-[#DCD6CC] rounded-xl text-xs text-[#222620] placeholder:text-[#9A9187] focus:outline-none focus:ring-1 focus:ring-[#8C6353] focus:border-[#8C6353] shadow-2xs transition-all"
@@ -48,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right User & Actions Controls */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* System Status Pill */}
           <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EAF2EC] border border-[#CFE2D4] text-[10px] font-semibold text-[#275336]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#2E5C3E]"></span>
@@ -58,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Official Brand Stamp button */}
           <button
             onClick={() => setShowLogoModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#FAF8F5] border border-[#DDD7CD] text-[#2A2C24] rounded-xl text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#FAF8F5] border border-[#DDD7CD] text-[#2A2C24] rounded-xl text-xs font-semibold shadow-2xs transition-all cursor-pointer"
             title="Ver Selo Oficial Ela Fit"
           >
             <img src="/logo.png" alt="Selo Ela Fit" className="w-4 h-4 rounded-full object-cover" />
@@ -75,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           {/* Notifications Bell with Solid Counter */}
-          <div className="relative cursor-pointer p-2 text-[#7A7268] hover:text-[#222620] hover:bg-white rounded-xl border border-transparent hover:border-[#DDD7CD] transition-all">
+          <div className="hidden sm:block relative cursor-pointer p-2 text-[#7A7268] hover:text-[#222620] hover:bg-white rounded-xl border border-transparent hover:border-[#DDD7CD] transition-all">
             <Bell className="w-4.5 h-4.5" />
             <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#C84A3E] text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-xs">
               3
@@ -99,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {displayName.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()}
                 </div>
               )}
-              <div className="text-left hidden sm:block">
+              <div className="text-left hidden md:block">
                 <p className="text-xs font-bold text-[#222620] leading-tight">{displayName}</p>
                 <p className="text-[10px] text-[#7A7268] font-medium leading-tight">{roleLabel}</p>
               </div>

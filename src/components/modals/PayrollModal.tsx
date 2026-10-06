@@ -93,7 +93,7 @@ export const PayrollModal: React.FC<PayrollModalProps> = ({ run, onClose }) => {
 
           {/* Remunerações e descontos */}
           <div className="border border-[#ECE5DE] rounded-xl overflow-hidden">
-            <table className="w-full text-left">
+            <div className="overflow-x-auto"><table className="w-full text-left min-w-[420px]">
               <thead className="bg-[#F4ECE6] text-[#2C3228] font-bold text-[10px] uppercase">
                 <tr>
                   <th className="p-3">Descrição</th>
@@ -140,7 +140,7 @@ export const PayrollModal: React.FC<PayrollModalProps> = ({ run, onClose }) => {
                   <td className="p-3 text-right font-bold text-base text-[#D0A68D]">{formatKz(run.net)}</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <p className="text-[11px] text-[#7A7067]">

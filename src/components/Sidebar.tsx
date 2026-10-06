@@ -17,11 +17,13 @@ import { TabType } from '../types';
 import { useAuth } from '../auth/AuthContext';
 
 interface SidebarProps {
+  open: boolean;
+  onClose: () => void;
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, open, onClose }) => {
   const { profile, hasModule } = useAuth();
   const allItems = [
     { id: 'overview' as TabType, label: 'Gestor de Negócio', icon: Home },
@@ -42,12 +44,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
   }
 
   return (
-    <aside className="w-64 bg-[#20221A] text-[#E5E0DA] min-h-screen flex flex-col justify-between p-4 sticky top-0 h-screen overflow-y-auto shrink-0 border-r border-[#323529] z-20 shadow-sm">
+    <>
+    {open && <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={onClose} />}
+    <aside className={`w-64 max-w-[85vw] bg-[#20221A] text-[#E5E0DA] flex flex-col justify-between p-4 fixed inset-y-0 left-0 lg:sticky lg:top-0 lg:h-screen h-[100dvh] overflow-y-auto dark-scroll shrink-0 border-r border-[#323529] z-40 lg:z-20 shadow-sm transition-transform duration-200 ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
       <div>
         {/* Brand Logo & Tagline Header */}
         <div 
           className="pt-4 pb-6 px-3 flex flex-col items-center justify-center cursor-pointer select-none"
-          onClick={() => menuItems[0] && setActiveTab(menuItems[0].id)}
+          onClick={() => { if (menuItems[0]) setActiveTab(menuItems[0].id); onClose(); }}
         >
           {/* Official Brand Seal Logo */}
           <div className="relative group flex items-center justify-center">
@@ -81,7 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
             return (
               <button
                 key={item.label}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => { setActiveTab(item.id); onClose(); }}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs font-medium transition-all ${
                   isActive
                     ? 'bg-[#33372B] text-[#FFFFFF] font-semibold border-l-[3px] border-[#D8B69F] rounded-r-xl shadow-xs'
@@ -112,5 +116,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
         </div>
       </div>
     </aside>
+    </>
   );
 };
