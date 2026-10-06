@@ -350,6 +350,8 @@ async function setupViteOrStatic() {
     });
   }
 
+  if (process.env.VERCEL) return; // na Vercel o Express corre como função serverless (api/index.js)
+
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Ela Fit Gestor running on http://localhost:${PORT} (${IS_PRODUCTION ? "produção" : "desenvolvimento"})`);
     console.log(
@@ -365,4 +367,6 @@ async function setupViteOrStatic() {
   });
 }
 
-setupViteOrStatic();
+if (!process.env.VERCEL) setupViteOrStatic();
+
+export default app;
